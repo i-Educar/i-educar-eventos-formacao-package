@@ -2,6 +2,7 @@
 
 namespace iEducar\Packages\BuritiEventosFormacao\Services;
 
+use iEducar\Packages\BuritiEventosFormacao\Support\EventoPublico;
 use iEducar\Packages\BuritiEventosFormacao\Support\PocRegistro;
 use Illuminate\Support\Facades\DB;
 
@@ -132,9 +133,15 @@ final class EventosDemoService
 
         $out = [];
         foreach ($cenarios as $c) {
+            $externa = in_array($c['status'], ['aberto', 'encerrado'], true);
             $id = PocRegistro::salvar('evento', $c['titulo'], $c['local'], array_merge($c, [
                 'demo' => self::DEMO_TAG,
                 'organizador' => 'SME Laguna · Formação continuada',
+                'publico' => 'ambos',
+                'inscricao_externa' => $externa,
+                'publico_token' => $externa ? EventoPublico::tokenNovo() : null,
+                'certificado' => true,
+                'inscricao_inicio' => now()->subDays(7)->format('Y-m-d'),
             ]));
             $out[] = [
                 'id' => $id,
@@ -180,9 +187,17 @@ final class EventosDemoService
                 'evento' => $ev['titulo'],
                 'cpf' => $p['cpf'],
                 'tipo' => $p['tipo'],
+                'origem' => $p['tipo'] === 'externo' ? 'portal' : 'admin',
                 'status' => 'confirmada',
                 'demo' => self::DEMO_TAG,
             ]);
+            $protocolo = EventoPublico::protocolo($id);
+            $reg = PocRegistro::buscar($id);
+            if ($reg !== null) {
+                $payload = $reg['payload'];
+                $payload['protocolo'] = $protocolo;
+                PocRegistro::atualizar($id, $payload, $reg['titulo'], $protocolo);
+            }
             $out[] = [
                 'id' => $id,
                 'evento_id' => $ev['id'],

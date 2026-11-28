@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="{{ url('/intranet/styles/font-awesome.css') }}">
     <style>
         :root {
-            --cor: {{ $identidade['cor'] ?? '#1e4d7b' }};
-            --destaque: {{ $identidade['destaque'] ?? '#2f6fad' }};
-            --clara: {{ $identidade['clara'] ?? '#e8f1f8' }};
-            --nav: #15222b; --nav-texto: #d5e0e6; --fundo: #e8edf2;
+            --cor: {{ $identidade['cor'] ?? '#0a7a8a' }};
+            --destaque: {{ $identidade['destaque'] ?? '#20c997' }};
+            --clara: {{ $identidade['clara'] ?? '#e6f8f5' }};
+            --nav: #15222b; --nav-texto: #e8eef3; --fundo: #e8edf2;
             --tinta: #1a242b; --suave: #5b6b76; --linha: #cfd8df;
             --ok: #17663f; --ok-fundo: #e5f6ec; --erro: #9b2c2c; --erro-fundo: #fdeceb;
             --ambar: #b86e00; --cor-tela: var(--cor);
@@ -31,13 +31,14 @@
         .modulo-nome { width: 100%; display: flex; justify-content: space-between; margin: 0; padding: 8px; background: 0; border: 0; color: #8aa0ad; font: inherit; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
         .modulo a { display: flex; align-items: center; gap: 10px; color: var(--nav-texto); text-decoration: none; border-radius: 10px; padding: 8px 10px; }
         .modulo a i { width: 18px; text-align: center; }
-        .modulo a:hover, .modulo a.ativo { background: color-mix(in srgb, var(--cor) 88%, #fff); color: #fff; font-weight: 700; }
+        .modulo a:hover { background: color-mix(in srgb, var(--cor) 42%, rgba(255,255,255,.08)); color: #fff; }
+        .modulo a.ativo { background: color-mix(in srgb, var(--cor) 68%, #060b10); color: #fff; font-weight: 700; box-shadow: inset 3px 0 0 var(--destaque, var(--cor)); }
         .miolo { flex: 1; min-width: 0; display: flex; flex-direction: column; }
         .topo { position: sticky; top: 0; z-index: 10; min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 18px; background: color-mix(in srgb,#fff 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--linha); }
         .migalha { margin: 0; color: var(--suave); font-size: 13px; } .migalha a { color: var(--cor); font-weight: 700; text-decoration: none; }
         main { padding: 18px 20px 28px; flex: 1; }
         .cabeca-tela { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: -18px -20px 16px; padding: 14px 16px 14px 20px;
-            background: linear-gradient(120deg, color-mix(in srgb, var(--clara) 70%, #fff), #fff 55%); border-bottom: 1px solid var(--linha); border-left: 4px solid var(--cor-tela); }
+            background: linear-gradient(120deg, color-mix(in srgb, var(--clara) 70%, var(--mix-branco, #fff)), var(--superficie, #fff) 55%); border-bottom: 1px solid var(--linha); border-left: 4px solid var(--cor-tela); }
         .identidade-tela { display: flex; align-items: center; gap: 12px; }
         .marca-tela { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(145deg, var(--destaque), var(--cor-tela)); color: #fff; font-size: 18px; box-shadow: 0 10px 20px color-mix(in srgb, var(--cor-tela) 28%, transparent); }
         .cabeca-tela h1 { margin: 0; font-size: 1.25rem; }
@@ -46,17 +47,17 @@
         .cabeca-tela .lead { margin: 2px 0 0; color: var(--suave); }
         .acoes-tela { display: flex; flex-wrap: wrap; gap: 8px; }
         .botao { display: inline-flex; align-items: center; gap: 8px; background: var(--cor-tela); color: #fff; border: 0; border-radius: 10px; padding: 8px 12px; font: inherit; text-decoration: none; cursor: pointer; }
-        .botao.claro { background: #fff; color: var(--cor-tela); border: 1px solid color-mix(in srgb, var(--cor-tela) 35%, var(--linha)); }
+        .botao.claro { background: var(--superficie, #fff); color: var(--cor-tela); border: 1px solid color-mix(in srgb, var(--cor-tela) 35%, var(--linha)); }
         .flash { border-radius: 12px; padding: 12px 14px; margin: 0 0 16px; } .flash.ok { background: var(--ok-fundo); color: var(--ok); } .flash.erro { background: var(--erro-fundo); color: var(--erro); }
-        .bloco { background: #fff; border: 1px solid var(--linha); border-radius: 14px; padding: 14px 16px; margin: 0 0 12px; border-top: 3px solid var(--cor-tela); box-shadow: 0 10px 24px rgba(21,34,43,.04); }
+        .bloco { background: var(--superficie, #fff); border: 1px solid var(--linha); border-radius: 14px; padding: 14px 16px; margin: 0 0 12px; border-top: 3px solid var(--cor-tela); box-shadow: 0 10px 24px rgba(21,34,43,.04); }
         .bloco h2 { margin: 0 0 10px; display: flex; align-items: center; gap: 8px; font-size: 1.05rem; }
         .numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin: 0 0 16px; }
-        .numeros article { --tom: var(--cor-tela); background: #fff; border: 1px solid color-mix(in srgb, var(--tom) 30%, var(--linha)); border-top: 3px solid var(--tom); border-radius: 14px; padding: 14px; box-shadow: 0 8px 18px rgba(21,34,43,.05); }
-        .numeros .kpi-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; margin: 0 0 8px; background: color-mix(in srgb, var(--tom) 12%, #fff); color: var(--tom); border: 1px solid color-mix(in srgb, var(--tom) 22%, #fff); }
+        .numeros article { --tom: var(--cor-tela); background: var(--superficie, #fff); border: 1px solid color-mix(in srgb, var(--tom) 30%, var(--linha)); border-top: 3px solid var(--tom); border-radius: 14px; padding: 14px; box-shadow: 0 8px 18px rgba(21,34,43,.05); }
+        .numeros .kpi-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; margin: 0 0 8px; background: color-mix(in srgb, var(--tom) 12%, var(--superficie, #fff)); color: var(--tom); border: 1px solid color-mix(in srgb, var(--tom) 22%, var(--superficie, #fff)); }
         .numeros span { display: block; color: var(--suave); font-size: .75rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
         .numeros strong { font-size: 1.4rem; letter-spacing: -.03em; }
         .atalhos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
-        .atalhos a { display: grid; grid-template-columns: 42px 1fr; gap: 10px; align-items: center; min-height: 64px; padding: 10px 12px; border: 1px solid var(--linha); border-radius: 14px; text-decoration: none; color: var(--tinta); background: linear-gradient(180deg, color-mix(in srgb, var(--clara) 55%, #fff), #fff); font-weight: 700; }
+        .atalhos a { display: grid; grid-template-columns: 42px 1fr; gap: 10px; align-items: center; min-height: 64px; padding: 10px 12px; border: 1px solid var(--linha); border-radius: 14px; text-decoration: none; color: var(--tinta); background: linear-gradient(180deg, color-mix(in srgb, var(--clara) 55%, var(--mix-branco, #fff)), var(--superficie, #fff)); font-weight: 700; }
         .atalhos a i { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; color: #fff; background: var(--destaque); }
         .atalhos a small { display: block; font-weight: 500; color: var(--suave); margin-top: 2px; }
         .atalhos a:hover { transform: translateY(-2px); border-color: var(--destaque); }
@@ -65,11 +66,11 @@
         table { width: 100%; border-collapse: collapse; } th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--linha); } th { background: var(--clara); color: var(--cor); }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; align-items: end; }
         .form-grid label { display: grid; gap: 4px; font-size: .8rem; font-weight: 700; color: var(--suave); }
-        .form-grid input, .form-grid select, .form-grid textarea { min-height: 36px; padding: 6px 8px; border: 1px solid var(--linha); border-radius: 8px; font: inherit; background: #fff; }
+        .form-grid input, .form-grid select, .form-grid textarea { min-height: 36px; padding: 6px 8px; border: 1px solid var(--linha); border-radius: 8px; font: inherit; background: var(--superficie, #fff); }
         .form-grid .col-wide { grid-column: 1 / -1; }
         .form-grid .acoes { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; }
         .lista-obras { display: grid; gap: 8px; }
-        .obra { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--linha); border-radius: 12px; background: #fff; }
+        .obra { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--linha); border-radius: 12px; background: var(--superficie, #fff); }
         .obra h3 { margin: 0; font-size: .95rem; } .obra .meta { margin: 2px 0 0; color: var(--suave); font-size: .8rem; }
         footer.rodape { background: var(--nav); color: var(--nav-texto); border-top: 3px solid var(--destaque); padding: 12px 18px; font-size: .82rem; }
         @media (max-width: 860px) { .lateral { display: none; } }
@@ -79,7 +80,7 @@
 @php $grupos = $menuGrupos ?? []; @endphp
 <div class="app">
     <aside class="lateral">
-        <a class="marca" href="{{ url('/eventos-formacao') }}" title="{{ $identidade['nome'] ?? '' }}">
+        <a class="marca" href="{{ $homeModulo ?? url('/eventos-formacao') }}" title="{{ $identidade['nome'] ?? '' }}">
             <span class="icone"><i class="fa {{ $identidade['icone'] ?? 'fa-calendar' }}"></i></span>
         </a>
         @foreach($grupos as $grupo)
@@ -95,7 +96,7 @@
     </aside>
     <div class="miolo">
         @php
-            $homeModulo = url('/eventos-formacao');
+            $homeModulo = $homeModulo ?? url('/eventos-formacao');
             $nomeModulo = $identidade['nome'] ?? 'Eventos e formação';
             $descricaoModulo = $identidade['descricao'] ?? null;
             $menuGrupos = $menuGrupos ?? ($grupos ?? []);
@@ -112,8 +113,19 @@
                         @hasSection('lead')<p class="lead">@yield('lead')</p>@endif
                     </div>
                 </div>
-                <div class="acoes-tela">@yield('acoes-topo')</div>
+                <div class="acoes-tela">
+                    @yield('acoes-topo')
+                    @includeWhen(View::exists('buriti-ui::informes-modulo'), 'buriti-ui::informes-modulo')
+                </div>
             </header>
+
+            @hasSection('foco')
+                @yield('foco')
+            @endif
+            @hasSection('trilho')
+                <nav class="buriti-trilho" aria-label="Ações da tela">@yield('trilho')</nav>
+            @endif
+
             @yield('conteudo')
         </main>
         @include('buriti-ui::estilos')

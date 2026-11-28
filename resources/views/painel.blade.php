@@ -7,8 +7,8 @@
     Cadastre cursos e palestras, controle vagas, presença e certificados.
 @endsection
 @section('acoes-topo')
-    <a class="botao" href="{{ url('/eventos-formacao/eventos') }}"><i class="fa fa-plus"></i> Novo evento</a>
-    <a class="botao claro" href="{{ url('/eventos-formacao/inscricoes') }}"><i class="fa fa-ticket"></i> Inscrições</a>
+    <a class="botao icone" href="{{ url('/eventos-formacao/eventos') }}" title="Novo evento" aria-label="Novo evento"><i aria-hidden="true" class="fa fa-plus"></i></a>
+    <a class="botao claro icone" href="{{ url('/eventos-formacao/inscricoes') }}" title="Inscrições" aria-label="Inscrições"><i aria-hidden="true" class="fa fa-ticket"></i></a>
 @endsection
 
 @section('conteudo')

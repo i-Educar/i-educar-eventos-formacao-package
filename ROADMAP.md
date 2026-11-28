@@ -1,7 +1,7 @@
 # ROADMAP — Gestão de Eventos / Formação Continuada
 
 > Pacote: `buriti/i-educar-eventos-formacao-package` · TR **5.12** · Prioridade **P0** · Nota **D**  
-> Alinhado a `tmp/DOC-EXECUTIVO-PE-77-2026-LAGUNA-IEDUCAR.md`
+> Alinhado a `packages/buriti/docs/laguna/DOC-EXECUTIVO-PE-77-2026-LAGUNA-IEDUCAR.md`
 
 ## Visão
 

@@ -4,11 +4,13 @@ namespace iEducar\Packages\BuritiEventosFormacao\Http\Controllers;
 
 use iEducar\Packages\BuritiEventosFormacao\Services\CertificadoPresenca;
 use iEducar\Packages\BuritiEventosFormacao\Services\EventoInscricao;
+use iEducar\Packages\BuritiEventosFormacao\Support\EventoPublico;
 use iEducar\Packages\BuritiEventosFormacao\Support\PocRegistro;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class EventosController extends Controller
 {
@@ -34,10 +36,11 @@ class EventosController extends Controller
                 ['rotulo' => 'Certificados', 'valor' => count($certs), 'icone' => 'fa-certificate', 'tom' => 'var(--ambar)'],
             ],
             'atalhos' => [
-                ['rotulo' => 'Novo evento', 'url' => '/eventos-formacao/eventos', 'icone' => 'fa-plus', 'meta' => 'Cadastro'],
-                ['rotulo' => 'Inscrições', 'url' => '/eventos-formacao/inscricoes', 'icone' => 'fa-ticket', 'meta' => 'Vagas e fila'],
-                ['rotulo' => 'Presença', 'url' => '/eventos-formacao/presenca', 'icone' => 'fa-check', 'meta' => 'Frequência'],
+                ['rotulo' => 'Novo evento', 'url' => '/eventos-formacao/eventos', 'icone' => 'fa-plus', 'meta' => 'Cadastro e portal'],
+                ['rotulo' => 'Inscrições', 'url' => '/eventos-formacao/inscricoes', 'icone' => 'fa-ticket', 'meta' => 'Internas e externas'],
+                ['rotulo' => 'Presença', 'url' => '/eventos-formacao/presenca', 'icone' => 'fa-check', 'meta' => 'Check-in / frequência'],
                 ['rotulo' => 'Certificados', 'url' => '/eventos-formacao/certificados', 'icone' => 'fa-certificate', 'meta' => 'Emissão'],
+                ['rotulo' => 'Portal público', 'url' => '/eventos-formacao/portal', 'icone' => 'fa-external-link', 'meta' => 'Sem login'],
             ],
             'destaques' => [
                 [
@@ -45,7 +48,7 @@ class EventosController extends Controller
                     'meta' => $inscritos.' inscrição(ões) · '.count($certs).' certificado(s)',
                     'icone' => 'fa-calendar',
                     'tom' => 'var(--cor)',
-                    'corpo' => 'Período, local, carga horária, vagas e liberação de certificado.',
+                    'corpo' => 'Marque «aceitar inscrições externas» para gerar páginas públicas de inscrição, presença e certificado.',
                 ],
             ],
             'analise' => array_map(static function (array $e): array {
@@ -62,15 +65,57 @@ class EventosController extends Controller
             }, array_slice($eventos, 0, 6)),
             'analiseTitulo' => 'Últimos eventos',
             'fluxoTitulo' => 'Fluxo do módulo',
-            'resumo' => 'Cadastre o evento → abra inscrições → registre presença → emita certificados.',
+            'resumo' => 'Cadastre o evento → libere inscrição (interna e/ou externa) → presença → certificados.',
         ]);
     }
 
     public function eventos(): View
     {
+        $registros = array_map(static function (array $e): array {
+            $e['links_publicos'] = [
+                'inscricao' => EventoPublico::urlInscricao($e),
+                'presenca' => EventoPublico::urlPresenca($e),
+                'certificado' => EventoPublico::urlCertificado($e),
+            ];
+            $e['vagas_restantes'] = EventoPublico::vagasRestantes($e);
+
+            return $e;
+        }, PocRegistro::listar('evento'));
+
         return view('eventos::eventos', [
-            'registros' => PocRegistro::listar('evento'),
+            'registros' => $registros,
+            'portalUrl' => url('/eventos-formacao/portal'),
         ]);
+    }
+
+    public function exportarEventos(Request $request): Response|RedirectResponse
+    {
+        $linhas = [];
+        foreach (PocRegistro::listar('evento') as $r) {
+            $p = $r['payload'];
+            $linhas[] = [
+                $r['id'] ?? '',
+                (string) ($r['titulo'] ?? ''),
+                (string) ($p['local'] ?? ''),
+                (string) ($p['inicio'] ?? ''),
+                (string) ($p['fim'] ?? ''),
+                (int) ($p['vagas'] ?? 0),
+                $p['carga_horaria'] ?? '',
+                (string) ($p['status'] ?? ''),
+                (string) ($p['publico'] ?? ''),
+            ];
+        }
+
+        return \iEducar\Packages\BuritiExportacaoUnificada\Support\ExportacaoModulo::download(
+            'Eventos de formação',
+            ['ID', 'Título', 'Local', 'Início', 'Fim', 'Vagas', 'Carga horária', 'Status', 'Público'],
+            $linhas,
+            'Eventos e formação',
+            strtolower(trim((string) $request->input('formato', 'pdf'))),
+            null,
+            null,
+            'eventos-formacao',
+        );
     }
 
     public function salvarEvento(Request $request): RedirectResponse
@@ -86,10 +131,12 @@ class EventosController extends Controller
             'vagas' => 'nullable|integer|min:0',
             'status' => 'nullable|in:rascunho,aberto,encerrado',
             'publico' => 'nullable|in:servidor,externo,ambos',
+            'inscricao_externa' => 'nullable|boolean',
             'certificado' => 'nullable|boolean',
         ]);
 
         $titulo = (string) $dados['titulo'];
+        $externa = $request->boolean('inscricao_externa');
         $payload = [
             'local' => $dados['local'] ?? null,
             'inicio' => $dados['inicio'] ?? null,
@@ -100,12 +147,19 @@ class EventosController extends Controller
             'vagas' => (int) ($dados['vagas'] ?? 0),
             'status' => $dados['status'] ?? 'rascunho',
             'publico' => $dados['publico'] ?? 'ambos',
-            'certificado' => (bool) ($dados['certificado'] ?? true),
+            'inscricao_externa' => $externa,
+            'publico_token' => $externa ? EventoPublico::tokenNovo() : null,
+            'certificado' => $request->boolean('certificado', true),
         ];
 
         PocRegistro::salvar('evento', $titulo, $payload['local'], $payload);
 
-        return redirect('/eventos-formacao/eventos')->with('ok', 'Evento cadastrado.');
+        $msg = 'Evento cadastrado.';
+        if ($externa) {
+            $msg .= ' Portal externo liberado (inscrição, presença e certificado).';
+        }
+
+        return redirect('/eventos-formacao/eventos')->with('ok', $msg);
     }
 
     public function inscricoes(): View
@@ -142,15 +196,25 @@ class EventosController extends Controller
             return back()->with('erro', $e->getMessage());
         }
 
-        PocRegistro::salvar('inscricao', (string) $dados['nome'], $evento['titulo'], [
+        $cpf = EventoPublico::limparCpf($dados['cpf'] ?? '');
+        $id = PocRegistro::salvar('inscricao', (string) $dados['nome'], $evento['titulo'], [
             'evento_id' => (int) $evento['id'],
             'evento' => $evento['titulo'],
-            'cpf' => $dados['cpf'] ?? null,
+            'cpf' => $cpf !== '' ? $cpf : null,
             'tipo' => $dados['tipo'] ?? 'servidor',
+            'origem' => 'admin',
             'status' => 'confirmada',
+            'protocolo' => null,
         ]);
+        $protocolo = EventoPublico::protocolo($id);
+        $insc = PocRegistro::buscar($id);
+        if ($insc !== null) {
+            $payload = $insc['payload'];
+            $payload['protocolo'] = $protocolo;
+            PocRegistro::atualizar($id, $payload, $insc['titulo'], $protocolo);
+        }
 
-        return redirect('/eventos-formacao/inscricoes')->with('ok', 'Inscrição registrada.');
+        return redirect('/eventos-formacao/inscricoes')->with('ok', 'Inscrição registrada ('.$protocolo.').');
     }
 
     public function presenca(): View

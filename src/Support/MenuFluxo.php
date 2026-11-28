@@ -21,29 +21,25 @@ final class MenuFluxo
 
         return array_values(array_filter([
             [
-                'nome' => 'Operação',
+                'nome' => 'Gestão',
                 'itens' => $filtrar([
-                    $item('painel', 'Início', '/eventos-formacao', 'fa-th-large'),
-                    $item('inscricoes', 'Inscrições', '/eventos-formacao/inscricoes', 'fa-ticket'),
-                    $item('presenca', 'Presença', '/eventos-formacao/presenca', 'fa-check-square-o'),
-                ]),
-            ],
-            [
-                'nome' => 'Cadastros',
-                'itens' => $filtrar([
+                    $item('painel', 'Painel', '/eventos-formacao', 'fa-th-large'),
                     $item('eventos', 'Eventos', '/eventos-formacao/eventos', 'fa-calendar'),
+                    $item('inscricoes', 'Inscrições', '/eventos-formacao/inscricoes', 'fa-ticket'),
                 ]),
             ],
             [
-                'nome' => 'Relatórios',
+                'nome' => 'No dia',
                 'itens' => $filtrar([
-                    $item('frequencia', 'Frequência', '/eventos-formacao/presenca', 'fa-bar-chart'),
-                ]),
-            ],
-            [
-                'nome' => 'Auditoria',
-                'itens' => $filtrar([
+                    $item('presenca', 'Presença', '/eventos-formacao/presenca', 'fa-check-square-o'),
                     $item('certificados', 'Certificados', '/eventos-formacao/certificados', 'fa-certificate'),
+                ]),
+            ],
+            [
+                'nome' => 'Público',
+                'itens' => $filtrar([
+                    $item('portal', 'Portal externo', '/eventos-formacao/portal', 'fa-external-link'),
+                    $item('frequencia', 'Frequência', '/eventos-formacao/presenca', 'fa-bar-chart'),
                 ]),
             ],
         ], static fn (array $g): bool => $g['itens'] !== []));

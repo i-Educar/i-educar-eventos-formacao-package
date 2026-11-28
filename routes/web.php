@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('eventos-formacao')->group(function (): void {
     Route::get('/', [EventosController::class, 'index']);
     Route::get('/eventos', [EventosController::class, 'eventos']);
+    Route::post('/eventos/exportar', [EventosController::class, 'exportarEventos']);
     Route::post('/eventos', [EventosController::class, 'salvarEvento']);
     Route::get('/inscricoes', [EventosController::class, 'inscricoes']);
     Route::post('/inscricoes', [EventosController::class, 'salvarInscricao']);

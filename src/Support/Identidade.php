@@ -4,17 +4,17 @@ namespace iEducar\Packages\BuritiEventosFormacao\Support;
 
 final class Identidade
 {
-    public const COR = '#0f5c4c';
+    public const COR = '#0a7a8a';
 
-    public const DESTAQUE = '#1a8a72';
+    public const DESTAQUE = '#20c997';
 
-    public const COR_CLARA = '#e6f5f1';
+    public const COR_CLARA = '#e6f8f5';
 
     public const ICONE = 'fa-calendar';
 
     public const NOME = 'Eventos e formação';
 
-    public const DESCRICAO = 'Cursos, palestras, inscrição e certificados';
+    public const DESCRICAO = 'Gestão de eventos, inscrição externa, presença e certificados';
 
     /** @return array{cor:string,destaque:string,clara:string,icone:string,nome:string,descricao:string} */
     public static function tokens(): array

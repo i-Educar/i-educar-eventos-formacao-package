@@ -2,7 +2,7 @@
 
 return [
     'public' => [
-        'aparecer_na_home' => (bool) env('EVENTOS_APARECER_NA_HOME', false),
+        'aparecer_na_home' => (bool) env('EVENTOS_APARECER_NA_HOME', true),
         'titulo' => 'Eventos e formação',
         'ordem' => 58,
         'url' => '/eventos-formacao/portal',
